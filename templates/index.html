@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Carte Interactive</title>
+    <!-- Inclure les liens vers les bibliothèques CSS et JavaScript de Leaflet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <style>
+        #map { height: 400px; }
+    </style>
+</head>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Carte Interactive-analyse des données géographiques /2023/06/15/ </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        form {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="animate__animated animate__fadeInDown">Carte Interactive-analyse des données géographiques /2023/06/15/ </h1>
+    <form method="POST" action="/show_location" class="animate__animated animate__fadeInUp">
+        <label for="coordinates">Sélectionnez les coordonnées :</label>
+        <select id="coordinates" name="coordinates">
+            {% for coordinate in coordinates %}
+            <option value="{{ coordinate[0] }},{{ coordinate[1] }}">{{ coordinate[0] }}, {{ coordinate[1] }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <button type="submit">Afficher</button>
+    </form>
+    {% if selected_latitude and selected_longitude %}
+    <h2 class="animate__animated animate__fadeIn">Point sélectionné :</h2>
+    <p class="animate__animated animate__fadeIn">Latitude : {{ selected_latitude.__str__() }}</p>
+    <p class="animate__animated animate__fadeIn"> Longitude : {{  selected_longitude.__str__() }}</p>
+    {% if commune %}
+    <p class="animate__animated animate__fadeIn">{{ "Commune : " + commune }}</p>
+    {% endif %}
+    {% if phénomène %}
+    <p class="animate__animated animate__fadeIn">Phénomènes corresppond  au département :</p>
+    <ul class="animate__animated animate__fadeIn">
+      {% for ph in phénomène %}
+      <li>{{ ph }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if couleur %}
+    <p class="animate__animated animate__fadeIn">niveau d'alerte(le couleur exprime le niveau d'alerte) :</p>
+    <ul class="animate__animated animate__fadeIn">
+      {% for coul in couleur %}
+      <li>{{ coul }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endif %}
+    {% if error_message %}
+    <p class="animate__animated animate__fadeIn">{{ error_message }}</p>
+    {% endif %}
+    <a href="/">Go back to home</a>
+    
+    
+    <div id="map"></div>
+    <script>
+        var map = L.map('map').setView([46.603354, 1.888334], 6); // Coordonnées centrées sur la France
+
+        // Ajouter une couche de tuiles de la carte OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+            maxZoom: 18
+        }).addTo(map);
+
+        // Définir les limites géographiques de la France
+        var franceBoundaries = L.rectangle([
+            [-51.124, -5.5], [42.235, 9.663]
+        ], {
+            weight: 1,
+            color: '#3388ff',
+            fill: false
+        }).addTo(map);
+
+        // Récupérer les coordonnées sélectionnées depuis les données du formulaire
+        var selectedCoordinates = [{{ selected_latitude }}, {{ selected_longitude }}];
+
+        // Créer un marqueur HTML personnalisé avec une popup
+        var marker = L.marker(selectedCoordinates).addTo(map);
+        marker.bindPopup("<div style='padding: 10px;'>Hello World</div>");
+
+        // Centrer la carte sur le marqueur
+        map.setView(selectedCoordinates, 12);
+    </script>
+</body>
+</html>

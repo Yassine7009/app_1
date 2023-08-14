@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/39f0743b-fadd-492d-aa7e-513b9b7c9529/resourceGroups/elamri_group-af2b/providers/Microsoft.Web/sites/elamri",
+    "appService.deploySubpath": "."
+}
